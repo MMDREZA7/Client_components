@@ -26,7 +26,7 @@ const App: React.FC = () => {
       <nav>
         <ul className="flex p-2 gap-2">
           {routes.map((route) => (
-            <li className="bg-gray-950 py-1 px-3 text-white font-bold text-md rounded">
+            <li className="bg-black py-2 px-8 text-white text-lg font-bold rounded hover:bg-gray-500 duration-150">
               <Link to={route.path}>{route.name}</Link>
             </li>
           ))}

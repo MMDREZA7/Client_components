@@ -1,7 +1,7 @@
 import React from "react";
 
 const FollowUp = () => {
-  return <div>SecondTab</div>;
+  return <div>FollowUp</div>;
 };
 
 export default FollowUp;
