@@ -88,21 +88,24 @@ const FollowUp = () => {
       <section>
         <div className="border-black border">
           {isSearch && (
-            <div className="bg-[#2a579a] text-white font-semibold py-2 pl-2 pr-5 flex items-center gap-2">
-              <div>Full Text Search</div>
-              <div className="flex items-center border-b border-black text-white text-sm">
-                <input
-                  type="text"
-                  name="search"
-                  className="border-none focus:outline-none focus:ring-0"
-                  value={searchFollowUp}
-                  onChange={(e) => changeSearchBar(e)}
-                  onSubmit={() => {
-                    console.log("hello", searchFollowUp);
-                  }}
-                />
-                <X size={20} onClick={() => setSearchFollowUp("")} />
+            <div className="flex justify-between items-center gap-2 bg-[#2a579a] text-white font-semibold py-2 pl-2 pr-5">
+              <div className="flex gap-2 items-center">
+                <div>Full Text Search</div>
+                <div className="flex items-center border-b border-black text-white text-sm">
+                  <input
+                    type="text"
+                    name="search"
+                    className="border-none focus:outline-none focus:ring-0"
+                    value={searchFollowUp}
+                    onChange={(e) => changeSearchBar(e)}
+                    onSubmit={() => {
+                      console.log("hello", searchFollowUp);
+                    }}
+                  />
+                  <X size={20} onClick={() => setSearchFollowUp("")} />
+                </div>
               </div>
+              <X color="Black" size={20} onClick={() => setIsSearch(false)} />
             </div>
           )}
 
@@ -115,6 +118,7 @@ const FollowUp = () => {
               onClick={() => setIsSearch(!isSearch)}
             />
           </div>
+
           <ul>
             <li>DataTable</li>
             <li>DataTable</li>

@@ -26,9 +26,12 @@ const App: React.FC = () => {
       <nav>
         <ul className="flex p-2 gap-2">
           {routes.map((route) => (
-            <li className="bg-black py-2 px-8 text-white text-lg font-bold rounded hover:bg-gray-500 duration-150">
-              <Link to={route.path}>{route.name}</Link>
-            </li>
+            <Link
+              className="flex justify-center items-center bg-black py-3 px-6 text-white text-md font-bold rounded hover:bg-gray-500 duration-150"
+              to={route.path}
+            >
+              {route.name}
+            </Link>
           ))}
         </ul>
       </nav>
