@@ -38,8 +38,8 @@ const App: React.FC = () => {
         <Route path="/followup" element={<FollowUp />} />
         <Route path="/alert" element={<Alert />} />
         <Route path="/expedit" element={<Expedit />} />
-        <Route path="/consult" element={<Reassign />} />
-        <Route path="/reassign" element={<Consult />} />
+        <Route path="/consult" element={<Consult />} />
+        <Route path="/reassign" element={<Reassign />} />
         <Route path="/forward" element={<Forward />} />
         <Route path="/itemaccess" element={<ItemAccess />} />
       </Routes>

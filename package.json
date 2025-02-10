@@ -10,7 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.7",
     "@tailwindcss/vite": "^4.0.5",
+    "ag-grid-community": "^33.0.4",
+    "ag-grid-react": "^33.0.4",
+    "primereact": "^10.9.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.5"
