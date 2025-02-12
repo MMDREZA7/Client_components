@@ -31,31 +31,10 @@ const FollowUp = () => {
     form: "",
     duration: "",
     date: "",
+    alertText: "",
     sendingChannel: "",
   });
-  const toast = useRef(null);
-
-  useEffect(() => {
-    if (selectedRow) {
-      setIsAccordionOpen(true);
-      if (selectedRow.followUpType == "Dynamic Date") {
-        setIsDynamicDate(true);
-      } else {
-        setIsDynamicDate(false);
-      }
-    }
-  }, [selectedRow]);
-
-  const formOptions = [
-    "CreationDate",
-    "SendDate",
-    "SeenDate",
-    "CompletionDate",
-    "DueDate",
-  ];
-  const sendingChannelOptions = ["SMS", "Email"];
-
-  const followUpData = [
+  const [followUpData, setFollowUpData] = useState([
     {
       followUpType: "Dynamic Date",
       duration: "50",
@@ -95,7 +74,27 @@ const FollowUp = () => {
       alertText: "Oops! We couldn't find what you're looking for",
       sendingChannel: "SMS",
     },
+  ]);
+
+  useEffect(() => {
+    if (selectedRow) {
+      setIsAccordionOpen(true);
+      if (selectedRow.followUpType == "Dynamic Date") {
+        setIsDynamicDate(true);
+      } else {
+        setIsDynamicDate(false);
+      }
+    }
+  }, [selectedRow]);
+
+  const formOptions = [
+    "CreationDate",
+    "SendDate",
+    "SeenDate",
+    "CompletionDate",
+    "DueDate",
   ];
+  const sendingChannelOptions = ["SMS", "Email"];
 
   const columnDef = [
     { field: "followUpType", header: "Follow Up Type" },
@@ -126,6 +125,8 @@ const FollowUp = () => {
   const changeFixDate = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
 
+    console.log(e);
+
     setDateFixDate(e.target.value);
   };
 
@@ -141,11 +142,17 @@ const FollowUp = () => {
   };
 
   const handleAdd = () => {
-    console.log("Form: ", form);
-    console.log("Duration: ", duration);
-    console.log("date FixDate: ", dateFixDate);
-    console.log("Sending Channel: ", sendingChannel);
-    console.log("Alert Text: ", alertText);
+    setFollowUpData([
+      ...followUpData,
+      {
+        followUpType: isDynamicDate ? "Dynamic Date" : "Fix Date",
+        duration: duration,
+        form: form,
+        alertText: alertText,
+        date: dateFixDate,
+        sendingChannel: sendingChannel,
+      },
+    ]);
 
     setIsAccordionOpen(false);
   };
@@ -163,13 +170,13 @@ const FollowUp = () => {
         <div className="border-black border">
           {isSearch && (
             <div className="flex justify-between items-center gap-2 bg-[#2a579a] text-white font-semibold py-2 pl-2 pr-5">
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-5 items-center">
                 <div>Full Text Search</div>
                 <div className="flex items-center border-b border-black text-white text-sm">
                   <input
                     type="text"
                     name="search"
-                    className="border-none focus:outline-none focus:ring-0"
+                    className="border-none focus:outline-none h-6 focus:ring-0"
                     value={searchFollowUp}
                     onChange={(e) => changeSearchBar(e)}
                     onSubmit={() => {
@@ -229,11 +236,9 @@ const FollowUp = () => {
           </DataTable>
         </div>
         <div className="flex item-center justify-end m-2 ">
-          <button
-            className={`px-5 py-1 bg-[#9e9eec] text-white font-bold rounded cursor-pointer`}
-          >
+          <Button severity="primary" disabled>
             Delete
-          </button>
+          </Button>
         </div>
       </section>
 
@@ -243,12 +248,27 @@ const FollowUp = () => {
           {isAccordionOpen ? (
             <CaretCircleUp
               size={30}
-              onClick={() => setIsAccordionOpen(false)}
+              onClick={() => {
+                setIsAccordionOpen(false);
+              }}
             />
           ) : (
             <CaretCircleDown
               size={30}
-              onClick={() => setIsAccordionOpen(true)}
+              onClick={() => {
+                setForm("");
+                setAlertText("");
+                setDateFixDate("");
+                setSelectedRow({
+                  alertText: "",
+                  date: "",
+                  duration: "",
+                  followUpType: "",
+                  form: "",
+                  sendingChannel: "",
+                });
+                setIsAccordionOpen(true);
+              }}
             />
           )}
           {isAccordionOpen ? "Cancel" : "New"}
@@ -261,8 +281,26 @@ const FollowUp = () => {
           }`}
         >
           <div className="bg-[#d3d3d3] px-2 py-1 rounded-lg">
-            follow up schedule
-            {isDynamicDate}
+            <div className="flex justify-between items-center">
+              <label>follow up schedule</label>
+              <X
+                size={20}
+                onClick={() => {
+                  setForm("");
+                  setAlertText("");
+                  setDateFixDate("");
+                  setSelectedRow({
+                    alertText: "",
+                    date: "",
+                    duration: "",
+                    followUpType: "",
+                    form: "",
+                    sendingChannel: "",
+                  });
+                  setIsDynamicDate(true);
+                }}
+              />
+            </div>
             <div className={`grid grid-cols-3 items-center my-1 select-none`}>
               <div className="flex gap-1 items-center text-sm cursor-pointer">
                 <input
@@ -306,7 +344,9 @@ const FollowUp = () => {
                 <input
                   type="text"
                   name="duration"
-                  value={selectedRow ? selectedRow.duration : duration}
+                  value={
+                    selectedRow.duration != "" ? selectedRow.duration : duration
+                  }
                   // value={duration}
                   defaultValue={selectedRow.duration}
                   onChange={changeDuraiton}
@@ -325,7 +365,7 @@ const FollowUp = () => {
                   checked={!isDynamicDate}
                   onClick={() => setIsDynamicDate(false)}
                 />
-                <label className="text-sm">Fix Date</label>
+                <label className="text-sm">Fix Date {isDynamicDate}</label>
               </div>
 
               <div
@@ -339,11 +379,7 @@ const FollowUp = () => {
                 <input
                   type="date"
                   name="fixDate"
-                  value={
-                    selectedRow.date
-                      ? selectedRow.date.toString().split("/")[0]
-                      : ""
-                  }
+                  value={selectedRow.date ? selectedRow.date : dateFixDate}
                   onChange={changeFixDate}
                 />
               </div>
@@ -392,7 +428,11 @@ const FollowUp = () => {
                 <textarea
                   className="w-full focus:outline-0 focus:border-none border-b"
                   maxLength={350}
-                  value={selectedRow ? selectedRow.alertText : alertText}
+                  value={
+                    selectedRow.alertText != ""
+                      ? selectedRow.alertText
+                      : alertText
+                  }
                   onChange={(e) => changeAlertText(e)}
                 ></textarea>
               </div>
