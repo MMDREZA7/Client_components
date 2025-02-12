@@ -14,6 +14,7 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import GridLayoutComponent from "../../components/grid/GridLayoutComponent";
 import { Toast } from "primereact/toast";
 
 const FollowUp = () => {
@@ -75,17 +76,18 @@ const FollowUp = () => {
       sendingChannel: "SMS",
     },
   ]);
+  const toast = useRef(null);
 
-  useEffect(() => {
-    if (selectedRow) {
-      setIsAccordionOpen(true);
-      if (selectedRow.followUpType == "Dynamic Date") {
-        setIsDynamicDate(true);
-      } else {
-        setIsDynamicDate(false);
-      }
-    }
-  }, [selectedRow]);
+  // useEffect(() => {
+  //   if (selectedRow.followUpType != "") {
+  //     setIsAccordionOpen(true);
+  //     if (selectedRow.followUpType == "Dynamic Date") {
+  //       setIsDynamicDate(true);
+  //     } else {
+  //       setIsDynamicDate(false);
+  //     }
+  //   }
+  // }, []);
 
   const formOptions = [
     "CreationDate",
@@ -142,6 +144,9 @@ const FollowUp = () => {
   };
 
   const handleAdd = () => {
+    if (followUpData.followUpType != "") {
+      return;
+    }
     setFollowUpData([
       ...followUpData,
       {
@@ -158,6 +163,17 @@ const FollowUp = () => {
   };
 
   const handleCancel = () => {
+    setForm("");
+    setAlertText("");
+    setDateFixDate("");
+    setSelectedRow({
+      alertText: "",
+      date: "",
+      duration: "",
+      followUpType: "",
+      form: "",
+      sendingChannel: "",
+    });
     setIsAccordionOpen(false);
   };
 
@@ -179,9 +195,7 @@ const FollowUp = () => {
                     className="border-none focus:outline-none h-6 focus:ring-0"
                     value={searchFollowUp}
                     onChange={(e) => changeSearchBar(e)}
-                    onSubmit={() => {
-                      console.log("hello", searchFollowUp);
-                    }}
+                    onSubmit={() => {}}
                   />
                   <X size={20} onClick={() => setSearchFollowUp("")} />
                 </div>
@@ -205,6 +219,7 @@ const FollowUp = () => {
             stripedRows
             selectionMode={"single"}
             onSelectionChange={(e) => {
+              setIsAccordionOpen(true);
               console.log("SELECTED ROW", e);
 
               console.log("start .....");
@@ -249,6 +264,17 @@ const FollowUp = () => {
             <CaretCircleUp
               size={30}
               onClick={() => {
+                setForm("");
+                setAlertText("");
+                setDateFixDate("");
+                setSelectedRow({
+                  alertText: "",
+                  date: "",
+                  duration: "",
+                  followUpType: "",
+                  form: "",
+                  sendingChannel: "",
+                });
                 setIsAccordionOpen(false);
               }}
             />
@@ -280,9 +306,9 @@ const FollowUp = () => {
             isAccordionOpen ? "max-h-[500px]" : "max-h-0"
           }`}
         >
-          <div className="bg-[#d3d3d3] px-2 py-1 rounded-lg">
-            <div className="flex justify-between items-center">
-              <label>follow up schedule</label>
+          <GridLayoutComponent
+            title="follow up schedule"
+            icon={
               <X
                 size={20}
                 onClick={() => {
@@ -300,144 +326,132 @@ const FollowUp = () => {
                   setIsDynamicDate(true);
                 }}
               />
+            }
+          >
+            <div className="flex gap-1 items-center text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="dynamicDate"
+                value="dynamicDate"
+                checked={isDynamicDate}
+                onClick={() => setIsDynamicDate(true)}
+              />
+              <label className="text-sm">Dynamic Date</label>
             </div>
-            <div className={`grid grid-cols-3 items-center my-1 select-none`}>
-              <div className="flex gap-1 items-center text-sm cursor-pointer">
-                <input
-                  type="radio"
-                  name="dynamicDate"
-                  value="dynamicDate"
-                  checked={isDynamicDate}
-                  onClick={() => setIsDynamicDate(true)}
-                />
-                <label className="text-sm">Dynamic Date</label>
-              </div>
 
-              <div
-                className={`flex items-center ${
-                  !isDynamicDate && "pointer-events-none opacity-40"
-                }`}
+            <div
+              className={`flex items-center ${
+                !isDynamicDate && "pointer-events-none opacity-40"
+              }`}
+            >
+              <label className="font-bold text-sm opacity-50">Form: </label>
+              <select
+                name="form"
+                onChange={(e) => changeForm(e)}
+                value={
+                  selectedRow.form != undefined || selectedRow.form != null
+                    ? selectedRow.form.toLowerCase()
+                    : form
+                }
               >
-                <label className="font-bold text-sm opacity-50">Form: </label>
+                {formOptions.map((option) => (
+                  <option value={option.toLowerCase()}>{option}</option>
+                ))}
+              </select>
+            </div>
+            <div
+              className={`flex items-center ${
+                !isDynamicDate && "pointer-events-none opacity-40"
+              }`}
+            >
+              <label className="font-bold text-sm opacity-50">Duration:</label>
+              <input
+                type="text"
+                name="duration"
+                value={
+                  selectedRow.duration != "" ? selectedRow.duration : duration
+                }
+                // value={duration}
+                defaultValue={selectedRow.duration}
+                onChange={changeDuraiton}
+                className="border-b border-b-black focus:outline-none focus:ring-0"
+              />
+            </div>
+            <div className="flex gap-1 items-center text-sm cursor-pointer">
+              <input
+                type="radio"
+                name="dynamicDate"
+                value="fixDate"
+                className="relative"
+                checked={!isDynamicDate}
+                onClick={() => setIsDynamicDate(false)}
+              />
+              <label className="text-sm">Fix Date {isDynamicDate}</label>
+            </div>
+            <div
+              className={`flex items-center ${
+                isDynamicDate && "pointer-events-none opacity-40"
+              }`}
+            >
+              <label className="font-bold text-sm opacity-50">interDate:</label>
+              <input
+                type="date"
+                name="fixDate"
+                value={selectedRow.date ? selectedRow.date : dateFixDate}
+                onChange={changeFixDate}
+              />
+            </div>
+          </GridLayoutComponent>
+          {/* //! Notification Information */}
+          <GridLayoutComponent title="Notification Information" gridRows="1">
+            <div className="mb-3">
+              <div className="grid grid-cols-3 justify-center items-center">
+                <label className="col-span-2 text-sm">Sending Channel:</label>
                 <select
-                  name="form"
-                  onChange={(e) => changeForm(e)}
+                  className="w-full"
                   value={
-                    selectedRow.form != undefined || selectedRow.form != null
-                      ? selectedRow.form.toLowerCase()
-                      : form
+                    selectedRow.sendingChannel
+                      ? selectedRow.sendingChannel.toLowerCase()
+                      : sendingChannel
                   }
+                  onChange={(e) => changeSendingChannel(e)}
                 >
-                  {formOptions.map((option) => (
+                  {sendingChannelOptions.map((option) => (
                     <option value={option.toLowerCase()}>{option}</option>
                   ))}
                 </select>
               </div>
-              <div
-                className={`flex items-center ${
-                  !isDynamicDate && "pointer-events-none opacity-40"
-                }`}
-              >
-                <label className="font-bold text-sm opacity-50">
-                  Duration:
-                </label>
-                <input
-                  type="text"
-                  name="duration"
-                  value={
-                    selectedRow.duration != "" ? selectedRow.duration : duration
-                  }
-                  // value={duration}
-                  defaultValue={selectedRow.duration}
-                  onChange={changeDuraiton}
-                  className="border-b border-b-black focus:outline-none focus:ring-0"
-                />
+              <div className="flex h-full gap-2 items-center justify-around">
+                <button
+                  className="bg-[#0000cd] text-white font-bold w-full py-1 rounded"
+                  onClick={handleAdd}
+                >
+                  Add
+                </button>
+                <button
+                  className="bg-[#0000cd] text-white font-bold w-full py-1 rounded"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
-            {/* //! Fix Date */}
-            <div className="grid grid-cols-3 items-center my-1">
-              <div className="flex gap-1 items-center text-sm cursor-pointer">
-                <input
-                  type="radio"
-                  name="dynamicDate"
-                  value="fixDate"
-                  className="relative"
-                  checked={!isDynamicDate}
-                  onClick={() => setIsDynamicDate(false)}
-                />
-                <label className="text-sm">Fix Date {isDynamicDate}</label>
-              </div>
-
-              <div
-                className={`flex items-center ${
-                  isDynamicDate && "pointer-events-none opacity-40"
-                }`}
-              >
-                <label className="font-bold text-sm opacity-50">
-                  interDate:
-                </label>
-                <input
-                  type="date"
-                  name="fixDate"
-                  value={selectedRow.date ? selectedRow.date : dateFixDate}
-                  onChange={changeFixDate}
-                />
-              </div>
+            <div className="col-span-2">
+              <label className="font-bold text-sm opacity-50">
+                Alert Text:
+              </label>
+              <textarea
+                className="w-full focus:outline-0 focus:border-none border-b"
+                maxLength={350}
+                value={
+                  selectedRow.alertText != ""
+                    ? selectedRow.alertText
+                    : alertText
+                }
+                onChange={(e) => changeAlertText(e)}
+              ></textarea>
             </div>
-          </div>
-
-          {/* //! Notification Information */}
-          <div className="bg-[#d3d3d3] px-2 py-1 my-2 rounded-lg">
-            Notification Information
-            <div className="grid grid-cols-3 gap-2 justify-around items-cener">
-              <div className="mb-3">
-                <div className="grid grid-cols-3 justify-center items-center">
-                  <label className="col-span-2 text-sm">Sending Channel:</label>
-                  <select
-                    value={
-                      selectedRow.sendingChannel
-                        ? selectedRow.sendingChannel.toLowerCase()
-                        : sendingChannel
-                    }
-                    onChange={(e) => changeSendingChannel(e)}
-                  >
-                    {sendingChannelOptions.map((option) => (
-                      <option value={option.toLowerCase()}>{option}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex h-full gap-2 items-center justify-around">
-                  <button
-                    className="bg-[#0000cd] text-white font-bold w-full py-1 rounded"
-                    onClick={handleAdd}
-                  >
-                    Add
-                  </button>
-                  <button
-                    className="bg-[#0000cd] text-white font-bold w-full py-1 rounded"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-              <div className="col-span-2">
-                <label className="font-bold text-sm opacity-50">
-                  Alert Text:
-                </label>
-                <textarea
-                  className="w-full focus:outline-0 focus:border-none border-b"
-                  maxLength={350}
-                  value={
-                    selectedRow.alertText != ""
-                      ? selectedRow.alertText
-                      : alertText
-                  }
-                  onChange={(e) => changeAlertText(e)}
-                ></textarea>
-              </div>
-            </div>
-          </div>
+          </GridLayoutComponent>
         </div>
         {/* )} */}
       </section>
