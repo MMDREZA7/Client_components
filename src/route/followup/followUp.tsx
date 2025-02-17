@@ -89,13 +89,7 @@ const FollowUp = () => {
   //   }
   // }, []);
 
-  const formOptions = [
-    "CreationDate",
-    "SendDate",
-    "SeenDate",
-    "CompletionDate",
-    "DueDate",
-  ];
+  const formOptions = ["creationDate", "sendDate", "completionDate", "dueDate"];
   const sendingChannelOptions = ["SMS", "Email"];
 
   const columnDef = [
@@ -122,6 +116,8 @@ const FollowUp = () => {
   const changeForm = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
 
+    console.log("EEE", e.target.value);
+
     setForm(e.target.value);
   };
   const changeFixDate = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -144,9 +140,13 @@ const FollowUp = () => {
   };
 
   const handleAdd = () => {
-    if (followUpData.followUpType != "") {
+    if (followUpData.followUpType == "" || followUpData.form == "") {
       return;
     }
+    setForm("");
+    setAlertText("");
+    setDateFixDate("");
+    setDuration("");
     setFollowUpData([
       ...followUpData,
       {
@@ -166,6 +166,7 @@ const FollowUp = () => {
     setForm("");
     setAlertText("");
     setDateFixDate("");
+    setDuration("");
     setSelectedRow({
       alertText: "",
       date: "",
@@ -267,6 +268,18 @@ const FollowUp = () => {
                 setForm("");
                 setAlertText("");
                 setDateFixDate("");
+                setDuration("");
+                setFollowUpData([
+                  ...followUpData,
+                  {
+                    followUpType: isDynamicDate ? "Dynamic Date" : "Fix Date",
+                    duration: duration,
+                    form: form,
+                    alertText: alertText,
+                    date: dateFixDate,
+                    sendingChannel: sendingChannel,
+                  },
+                ]);
                 setSelectedRow({
                   alertText: "",
                   date: "",
@@ -282,17 +295,6 @@ const FollowUp = () => {
             <CaretCircleDown
               size={30}
               onClick={() => {
-                setForm("");
-                setAlertText("");
-                setDateFixDate("");
-                setSelectedRow({
-                  alertText: "",
-                  date: "",
-                  duration: "",
-                  followUpType: "",
-                  form: "",
-                  sendingChannel: "",
-                });
                 setIsAccordionOpen(true);
               }}
             />
@@ -308,13 +310,14 @@ const FollowUp = () => {
         >
           <GridLayoutComponent
             title="follow up schedule"
-            icon={
+            icons={
               <X
                 size={20}
                 onClick={() => {
                   setForm("");
                   setAlertText("");
                   setDateFixDate("");
+                  setDuration("");
                   setSelectedRow({
                     alertText: "",
                     date: "",
@@ -348,14 +351,10 @@ const FollowUp = () => {
               <select
                 name="form"
                 onChange={(e) => changeForm(e)}
-                value={
-                  selectedRow.form != undefined || selectedRow.form != null
-                    ? selectedRow.form.toLowerCase()
-                    : form
-                }
+                value={selectedRow.form ? selectedRow.form : form}
               >
                 {formOptions.map((option) => (
-                  <option value={option.toLowerCase()}>{option}</option>
+                  <option value={option}>{option}</option>
                 ))}
               </select>
             </div>
@@ -411,13 +410,13 @@ const FollowUp = () => {
                   className="w-full"
                   value={
                     selectedRow.sendingChannel
-                      ? selectedRow.sendingChannel.toLowerCase()
+                      ? selectedRow.sendingChannel
                       : sendingChannel
                   }
                   onChange={(e) => changeSendingChannel(e)}
                 >
                   {sendingChannelOptions.map((option) => (
-                    <option value={option.toLowerCase()}>{option}</option>
+                    <option value={option}>{option}</option>
                   ))}
                 </select>
               </div>
